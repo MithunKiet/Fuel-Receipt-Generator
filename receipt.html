@@ -3,160 +3,105 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="fuel-rate-endpoint" content="" />
   <title>HPCL Receipts Generator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Press Start 2P', monospace;
-      background: #eee;
-      padding: 20px;
+    @font-face {
+      font-family: 'Press Start 2P';
+      src: url('./assets/fonts/PressStart2P-Regular.ttf') format('truetype');
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
     }
-
-    h3 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .input-section {
-      margin: 0 auto 20px;
-      max-width: 1100px;
-      font-family: monospace;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(220px, 1fr));
-      gap: 10px 16px;
-      align-items: end;
-      margin-bottom: 12px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-    }
-
-    .field label {
-      font-size: 11px;
-      font-weight: bold;
-    }
-
-    input,
-    select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 6px;
-      font-size: 12px;
-    }
-
-    .range-inputs {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .range-inputs input {
-      width: calc(50% - 10px);
-    }
-
-    button {
-      display: block;
-      margin: 0 auto;
-      padding: 6px 12px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .logo {
-      width: 70px;
-      margin-bottom: 8px;
-    }
-
-    .title {
-      font-size: 10px;
-      font-weight: bold;
-      margin-top: 4px;
-    }
-
-    .section,
-    .footer {
-      font-size: 9px;
-      line-height: 1.4;
-      text-align: left;
-      margin-top: 9px;
-    }
-
-    .section-center {
-      text-align: center;
-    }
-
-    .footer {
-      font-size: 7.5px;
-      text-align: center;
-    }
-
-    .receipts-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-
+    :root { color-scheme: light; --ink: #232923; --muted: #71766e; --line: #dfe3da; --accent: #c3532c; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f5f6f1; color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+    .app-header { padding: 28px 40px; border-bottom: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 14px; }
+    .brand-mark { width: 42px; height: 42px; background: var(--ink); color: #fff; border-radius: 12px; display: grid; place-items: center; font: bold 23px monospace; }
+    h1 { margin: 0 0 5px; font-size: 21px; letter-spacing: -.6px; }
+    .app-header p { margin: 0; color: var(--muted); font-size: 13px; }
+    .workspace { max-width: 1440px; margin: auto; padding: 32px 40px 48px; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .input-section { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 26px; }
+    .eyebrow { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; }
+    h2 { margin: 9px 0; font-size: 21px; letter-spacing: -.5px; }
+    .panel-description { margin: 0 0 26px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 19px 14px; }
+    .field { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+    .field-wide { grid-column: 1 / -1; }
+    .field label { font-size: 11px; font-weight: 600; color: #52594f; letter-spacing: .2px; }
+    input, select { width: 100%; min-width: 0; min-height: 43px; border: 1px solid #d8ded3; border-radius: 7px; padding: 10px; background: #fcfdfb; color: var(--ink); font: 13px Arial, sans-serif; }
+    input:focus-visible, select:focus-visible, button:focus-visible { outline: 3px solid #e8b99d; outline-offset: 2px; }
+    .range-inputs { display: flex; gap: 10px; align-items: center; }
+    .range-inputs input { flex: 1; }
+    .range-inputs span { color: var(--muted); font-size: 12px; }
+    button { cursor: pointer; border: 0; border-radius: 8px; padding: 13px 17px; font-size: 13px; font-weight: 600; }
+    #generateBtn { width: 100%; margin-top: 26px; color: #fff; background: var(--ink); }
+    #generateBtn:hover { background: #384333; }
+    button:disabled { cursor: wait; opacity: .6; }
+    .sample-notice { margin: 16px 0 0; font-size: 11px; color: var(--muted); line-height: 1.7; }
+    .preview-panel { min-width: 0; }
+    .preview-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 22px; }
+    .preview-header h2 { margin-top: 0; }
+    .preview-header p { margin: 0; color: var(--muted); font-size: 12px; }
+    #printBtn { flex-shrink: 0; background: #fff; border: 1px solid #d6dcd0; }
+    #printBtn:disabled { cursor: default; }
+    .preview-surface { min-height: 620px; border: 1px solid #e1e5db; background: #eaece5; border-radius: 16px; padding: 30px 20px; }
+    .receipts-container { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 28px; }
+    .empty-state { text-align: center; max-width: 260px; margin: 130px auto 60px; color: var(--muted); }
+    .empty-icon { font: 34px monospace; margin-bottom: 20px; color: #949d8b; }
+    .empty-state h3 { color: #4d5745; font-size: 15px; margin: 0 0 10px; }
+    .empty-state p { font-size: 13px; line-height: 1.7; margin: 0; }
+    .preview-surface:has(.receipt) .empty-state { display: none; }
     .receipt {
-      flex: 1 1 calc(50% - 20px);
-      box-sizing: border-box;
-      max-width: 256px;
-      background: #efefefcc;
+      flex: 0 0 256px;
+      width: 256px;
+      max-width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
+      background: #f5f4ef;
+      color: #363631;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      font-weight: 400;
+      line-height: 1.4;
       text-align: center;
-      page-break-inside: avoid;
+      box-shadow: 0 2px 5px #25301d0c;
       break-inside: avoid;
+      page-break-inside: avoid;
     }
-
-    @media (max-width: 1000px) {
-      .form-grid {
-        grid-template-columns: repeat(2, minmax(220px, 1fr));
-      }
-    }
-
-    @media (max-width: 560px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    .logo { display: block; width: 70px; height: auto; margin: 0 auto 8px; filter: grayscale(1); opacity: .9; mix-blend-mode: multiply; }
+    .title { font-size: 10px; font-weight: bold; margin-top: 4px; }
+    .receipt-tag { font-size: 6px; letter-spacing: .3px; margin-top: 4px; }
+    .section { text-align: left; margin-top: 9px; overflow-wrap: anywhere; }
+    .section-center { text-align: center; }
+    .receipt-amount { font: inherit; margin: 0; }
+    .receipt-meta { font: inherit; color: inherit; }
+    .footer { margin-top: 9px; font-size: 7.5px; line-height: 1.4; overflow-wrap: anywhere; }
+    @media (max-width: 1050px) { .workspace { grid-template-columns: 330px minmax(0, 1fr); gap: 20px; padding: 24px; } .input-section { padding: 20px; } .preview-header { align-items: start; flex-direction: column; } }
+    @media (max-width: 740px) { .app-header { padding: 22px 20px; } .workspace { grid-template-columns: 1fr; padding: 20px; gap: 28px; } .preview-header { flex-direction: row; align-items: center; } .preview-surface { min-height: 360px; } .empty-state { margin: 60px auto; } input, select { font-size: 16px; } }
+    @media (max-width: 360px) { .workspace { padding: 12px; } .form-grid { grid-template-columns: 1fr; } .preview-header { flex-direction: column; align-items: start; } .preview-surface { padding: 20px 10px; } }
+    @page { margin: 10mm; }
     @media print {
-      body {
-        background: none;
-        padding: 0;
-      }
-
-      .receipts-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: flex-start;
-      }
-
-      .receipt {
-        page-break-inside: avoid;
-        break-inside: avoid;
-        border: 1px solid #000;
-        background: #fff;
-        box-shadow: none;
-      }
+      .app-header, .input-section, .preview-header, .empty-state { display: none !important; }
+      body, .preview-surface { background: #fff; }
+      .workspace, .preview-panel, .preview-surface { display: block; padding: 0; margin: 0; border: 0; border-radius: 0; min-height: 0; max-width: none; }
+      .receipts-container { gap: 8mm; justify-content: flex-start; }
+      .receipt { flex: 0 0 256px; width: 256px; padding: 10px; border: 0; box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }
   </style>
 </head>
 
 <body>
-  <h3>HPCL Receipts Generator</h3>
+  <header class="app-header">
+    <div class="brand-mark" aria-hidden="true">F</div>
+    <div><h1>Fuel Receipt Studio</h1><p>Create, preview &amp; print your sample receipts.</p></div>
+  </header>
+  <main class="workspace">
 
-  <div class="input-section">
+  <section class="input-section" aria-labelledby="detailsHeading">
+    <span class="eyebrow">01 / Receipt details</span>
+    <h2 id="detailsHeading">Make it yours.</h2>
+    <p class="panel-description">Enter the details below. We'll create one receipt for each day in your date range.</p>
     <div class="form-grid">
       <div class="field">
         <label for="vehType">VEH TYPE:</label>
@@ -173,27 +118,27 @@
         <input type="text" id="vehNo" value="UP13 AT6119">
       </div>
 
-      <div class="field">
+      <div class="field field-wide">
         <label for="custName">CUSTOMER NAME:</label>
         <input type="text" id="custName" value="Mithun Kumar">
       </div>
 
       <div class="field">
         <label for="fromDate">FROM DATE:</label>
-        <input type="date" id="fromDate">
+        <input type="date" id="fromDate" min="0001-01-01" max="9999-12-31">
       </div>
 
       <div class="field">
         <label for="toDate">TO DATE:</label>
-        <input type="date" id="toDate">
+        <input type="date" id="toDate" min="0001-01-01" max="9999-12-31">
       </div>
 
-      <div class="field">
+      <div class="field field-wide">
         <label for="fuelRangeStart">FUEL RANGE (LTR):</label>
         <div class="range-inputs">
-          <input type="number" id="fuelRangeStart" min="0.1" step="0.1" value="8">
-          <span>-</span>
-          <input type="number" id="fuelRangeEnd" min="0.1" step="0.1" value="20">
+          <input type="number" id="fuelRangeStart" aria-label="Minimum fuel quantity" min="0.01" max="1000000" step="0.01" value="8">
+          <span>to</span>
+          <input type="number" id="fuelRangeEnd" aria-label="Maximum fuel quantity" min="0.01" max="1000000" step="0.01" value="20">
         </div>
       </div>
 
@@ -209,11 +154,19 @@
     </div>
 
     <button id="generateBtn" type="button">Generate Receipts</button>
-  </div>
-
-  <hr>
-
-  <div id="receipts" class="receipts-container"></div>
+    <p class="sample-notice">Sample receipts with illustrative prices. Built-in rates are location-independent and last updated January 2025.</p>
+  </section>
+  <section class="preview-panel" aria-labelledby="previewHeading">
+    <div class="preview-header">
+      <div><h2 id="previewHeading">Receipt preview</h2><p id="previewStatus" role="status">Your receipts will appear here.</p></div>
+      <button id="printBtn" type="button" disabled>Print / Save PDF</button>
+    </div>
+    <div class="preview-surface">
+      <div class="empty-state"><div class="empty-icon" aria-hidden="true">▤</div><h3>Ready when you are.</h3><p>Fill in your details and select Generate Receipts to see your preview.</p></div>
+      <div id="receipts" class="receipts-container"></div>
+    </div>
+  </section>
+  </main>
 
   <script src="generator.js"></script>
 </body>
